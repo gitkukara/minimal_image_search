@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Image Search</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Image Search</p>
+          <h1>以图搜索</h1>
+        </div>
+        <select id="engineSelect" aria-label="选择搜索引擎">
+          <option value="google">Google</option>
+        </select>
+      </header>
+
+      <section class="dropzone" id="dropzone" tabindex="0">
+        <div class="lens-mark" aria-hidden="true"></div>
+        <p id="previewText">上传、粘贴或截取当前页面</p>
+        <img id="previewImage" alt="">
+      </section>
+
+      <section class="actions" aria-label="图片来源">
+        <button id="uploadButton" type="button">
+          <span aria-hidden="true">+</span>
+          上传图片
+        </button>
+        <button id="pasteButton" type="button">
+          <span aria-hidden="true">⌘</span>
+          粘贴图片
+        </button>
+        <button id="screenshotButton" type="button">
+          <span aria-hidden="true">□</span>
+          页面截图
+        </button>
+      </section>
+
+      <footer class="footer">
+        <button id="searchButton" type="button" disabled>开始搜索</button>
+        <p id="status" role="status" aria-live="polite"></p>
+      </footer>
+
+      <input id="fileInput" type="file" accept="image/*" hidden>
+    </main>
+
+    <script src="popup.js" type="module"></script>
+  </body>
+</html>
