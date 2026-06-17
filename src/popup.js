@@ -1,5 +1,6 @@
 const elements = {
   dropzone: document.querySelector("#dropzone"),
+  defaultActionSelect: document.querySelector("#defaultActionSelect"),
   engineSelect: document.querySelector("#engineSelect"),
   fileInput: document.querySelector("#fileInput"),
   pasteButton: document.querySelector("#pasteButton"),
@@ -14,12 +15,23 @@ const elements = {
 let selectedImage = null;
 
 elements.uploadButton.addEventListener("click", () => elements.fileInput.click());
-elements.dropzone.addEventListener("click", () => elements.fileInput.click());
+elements.dropzone.addEventListener("click", (event) => {
+  if (event.target === elements.defaultActionSelect) {
+    return;
+  }
+
+  runDefaultAction();
+});
 elements.dropzone.addEventListener("keydown", (event) => {
   if (event.key === "Enter" || event.key === " ") {
     event.preventDefault();
-    elements.fileInput.click();
+    runDefaultAction();
   }
+});
+elements.defaultActionSelect.addEventListener("click", (event) => event.stopPropagation());
+elements.defaultActionSelect.addEventListener("change", () => {
+  chrome.storage.local.set({ defaultDropzoneAction: elements.defaultActionSelect.value });
+  updateDefaultActionText();
 });
 
 elements.fileInput.addEventListener("change", async () => {
@@ -30,8 +42,10 @@ elements.fileInput.addEventListener("change", async () => {
 });
 
 elements.pasteButton.addEventListener("click", pasteFromClipboard);
-elements.screenshotButton.addEventListener("click", captureScreenshot);
+elements.screenshotButton.addEventListener("click", selectScreenshotArea);
 elements.searchButton.addEventListener("click", searchSelectedImage);
+
+restoreDefaultAction();
 
 for (const eventName of ["dragenter", "dragover"]) {
   elements.dropzone.addEventListener(eventName, (event) => {
@@ -96,16 +110,19 @@ async function pasteFromClipboard() {
   }
 }
 
-async function captureScreenshot() {
-  setStatus("正在截取当前标签页...");
+async function selectScreenshotArea() {
+  setStatus("请在当前页面拖拽选择截图区域。");
 
-  const response = await chrome.runtime.sendMessage({ type: "CAPTURE_VISIBLE_TAB" });
+  const response = await chrome.runtime.sendMessage({
+    type: "SELECT_SCREENSHOT_AREA",
+    engineId: elements.engineSelect.value
+  });
   if (!response?.ok) {
-    setStatus(response?.error || "截图失败。");
+    setStatus(response?.error || "截图取消或失败。");
     return;
   }
 
-  useDataUrl(response.dataUrl, response.fileName);
+  setStatus("截图已提交搜索。");
 }
 
 async function searchSelectedImage() {
@@ -143,4 +160,40 @@ function readFileAsDataUrl(file) {
 
 function setStatus(message) {
   elements.status.textContent = message;
+}
+
+async function runDefaultAction() {
+  const action = elements.defaultActionSelect.value;
+  if (action === "paste") {
+    await pasteFromClipboard();
+    return;
+  }
+
+  if (action === "screenshot") {
+    await selectScreenshotArea();
+    return;
+  }
+
+  elements.fileInput.click();
+}
+
+async function restoreDefaultAction() {
+  const stored = await chrome.storage.local.get("defaultDropzoneAction");
+  if (stored.defaultDropzoneAction) {
+    elements.defaultActionSelect.value = stored.defaultDropzoneAction;
+  }
+
+  updateDefaultActionText();
+}
+
+function updateDefaultActionText() {
+  const labels = {
+    upload: "点击大框上传图片",
+    paste: "点击大框粘贴图片",
+    screenshot: "点击大框选择截图区域"
+  };
+
+  if (!elements.dropzone.classList.contains("has-image")) {
+    elements.previewText.textContent = labels[elements.defaultActionSelect.value] || labels.upload;
+  }
 }

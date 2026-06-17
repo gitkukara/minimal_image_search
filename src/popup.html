@@ -19,6 +19,11 @@
       </header>
 
       <section class="dropzone" id="dropzone" tabindex="0">
+        <select id="defaultActionSelect" class="default-action-select" aria-label="选择大框默认功能">
+          <option value="upload">上传图片</option>
+          <option value="paste">粘贴图片</option>
+          <option value="screenshot">页面截图</option>
+        </select>
         <div class="lens-mark" aria-hidden="true"></div>
         <p id="previewText">上传、粘贴或截取当前页面</p>
         <img id="previewImage" alt="">
