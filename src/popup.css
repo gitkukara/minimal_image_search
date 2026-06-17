@@ -108,16 +108,11 @@ select {
   text-align: center;
 }
 
-.lens-mark {
-  width: 58px;
-  height: 58px;
+.brand-mark {
+  width: 64px;
+  height: 64px;
   margin-bottom: -46px;
-  border: 4px solid #2d6cdf;
-  border-right-color: #de5246;
-  border-bottom-color: #f4b400;
-  border-left-color: #0f9d58;
-  border-radius: 18px;
-  opacity: 0.92;
+  object-fit: contain;
 }
 
 #previewImage {
@@ -129,7 +124,7 @@ select {
   background: #ffffff;
 }
 
-.dropzone.has-image .lens-mark,
+.dropzone.has-image .brand-mark,
 .dropzone.has-image p {
   display: none;
 }

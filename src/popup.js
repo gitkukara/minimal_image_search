@@ -188,9 +188,9 @@ async function restoreDefaultAction() {
 
 function updateDefaultActionText() {
   const labels = {
-    upload: "点击大框上传图片",
-    paste: "点击大框粘贴图片",
-    screenshot: "点击大框选择截图区域"
+    upload: "点击此处上传图片",
+    paste: "点击此处粘贴图片",
+    screenshot: "点击此处选择截图区域"
   };
 
   if (!elements.dropzone.classList.contains("has-image")) {

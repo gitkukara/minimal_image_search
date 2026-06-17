@@ -25,7 +25,7 @@ A minimal Chrome / Edge extension for searching the web by image. It supports lo
 3. For screenshots, drag on the current page to select an area.
 4. Click **Start search** when an image preview is ready.
 
-The large drop area can be configured from its top-right menu. The selected default action is saved locally in the browser.
+The main drop area can be configured from its top-right menu. The selected default action is saved locally in the browser.
 
 ## Permissions
 
