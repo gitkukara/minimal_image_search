@@ -108,30 +108,11 @@ select {
   text-align: center;
 }
 
-.dropzone-mark {
-  width: 68px;
-  height: 68px;
+.brand-mark {
+  width: 64px;
+  height: 64px;
   margin-bottom: -46px;
-  color: #8c6f53;
-}
-
-.dropzone-mark svg {
-  width: 100%;
-  height: 100%;
-  fill: none;
-}
-
-.mark-corner,
-.mark-frame {
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 3.2;
-}
-
-.mark-fill {
-  fill: #d7c4a3;
-  stroke: none;
+  object-fit: contain;
 }
 
 #previewImage {
@@ -143,7 +124,7 @@ select {
   background: #ffffff;
 }
 
-.dropzone.has-image .dropzone-mark,
+.dropzone.has-image .brand-mark,
 .dropzone.has-image p {
   display: none;
 }
