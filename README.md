@@ -15,12 +15,12 @@
 - 上传本地图片。
 - 读取剪贴板中的图片。
 - 截取当前标签页可见区域。
-- 默认使用 Google Images / Lens 页面以图搜索。
+- 默认使用 Google 以图搜索，三个入口会统一进入自动上传流程。
 - 搜索引擎配置集中在 `src/background.js` 的 `SEARCH_ENGINES`，后续可继续添加其他引擎。
 
 ## 注意
 
-如果已经加载过旧版本，请在扩展管理页点击“重新加载”。本版本不再调用 Google 已不稳定的 `searchbyimage/upload` 旧接口，而是打开 Google Images / Lens 页面并自动把图片放入上传控件。
+如果已经加载过旧版本，请在扩展管理页点击“重新加载”。`0.1.2` 起不再注入 Google Images 首页，而是打开扩展自己的中转页，并用真实图片表单自动提交到 Google 搜索结果页。
 
 ## 文件结构
 
@@ -32,7 +32,10 @@ F:\image-search-extension
     ├── background.js
     ├── popup.css
     ├── popup.html
-    └── popup.js
+    ├── popup.js
+    ├── search.css
+    ├── search.html
+    └── search.js
 ```
 
 ## 后续扩展方向
