@@ -1,47 +1,40 @@
 # Minimal Image Search
 
-一款极简的 Chrome / Edge 浏览器插件，用于从插件按钮快速发起以图搜索。当前默认使用 Google，搜索入口支持上传图片、粘贴剪贴板图片、截取当前标签页可见区域。
+A minimal Chrome / Edge extension for searching the web by image. It supports local image upload, clipboard images, and selecting an area from the current page.
 
-## 使用方式
+## Features
 
-1. 打开 Chrome 或 Edge 的扩展管理页。
-2. 开启开发者模式。
-3. 选择“加载已解压的扩展”。
-4. 选择 `F:\image-search-extension`。
-5. 点击工具栏里的插件图标，选择图片来源后开始搜索。
+- Search by uploading a local image.
+- Search from an image copied to the clipboard.
+- Drag to select a screenshot area on the current page.
+- Choose the default action for the main drop area.
+- Uses Google image search by default.
 
-## 功能
+## Install
 
-- 上传本地图片。
-- 读取剪贴板中的图片。
-- 在当前页面上拖拽选择截图区域，并自动发起搜索。
-- 中间大框可设置默认动作：上传图片、粘贴图片或页面截图。
-- 默认使用 Google 以图搜索，三个入口会统一进入自动上传流程。
-- 搜索引擎配置集中在 `src/background.js` 的 `SEARCH_ENGINES`，后续可继续添加其他引擎。
+1. Download or clone this repository.
+2. Open the extensions page in Chrome or Edge.
+3. Enable developer mode.
+4. Choose **Load unpacked**.
+5. Select the project folder that contains `manifest.json`.
 
-## 注意
+## Use
 
-如果已经加载过旧版本，请在扩展管理页点击“重新加载”。`0.1.3` 起页面截图不再直接截取完整可见页，而是在当前网页上拖拽选择截图区域；中间大框右上角可以选择默认功能。
+1. Click the extension icon in the browser toolbar.
+2. Choose an image source: upload, paste, or screenshot.
+3. For screenshots, drag on the current page to select an area.
+4. Click **Start search** when an image preview is ready.
 
-## 文件结构
+The large drop area can be configured from its top-right menu. The selected default action is saved locally in the browser.
 
-```text
-F:\image-search-extension
-├── manifest.json
-├── README.md
-└── src
-    ├── background.js
-    ├── popup.css
-    ├── popup.html
-    ├── popup.js
-    ├── search.css
-    ├── search.html
-    └── search.js
-```
+## Permissions
 
-## 后续扩展方向
+- `activeTab`: access the current tab when selecting a screenshot area.
+- `clipboardRead`: read images from the clipboard after user action.
+- `scripting`: show the screenshot selection overlay on the current page.
+- `storage`: remember the main drop area's default action and pass image data between extension pages.
+- `tabs`: open the search result page.
 
-- 添加 Bing Visual Search、Yandex Images 等搜索引擎。
-- 增加截图区域选择，而不只是当前可见页面。
-- 添加右键菜单，对网页图片直接发起搜索。
-- 记住上一次使用的搜索引擎。
+## Notes
+
+This extension currently uses Google as the default image search engine.
