@@ -1,40 +1,32 @@
 # Minimal Image Search
 
-A minimal Chrome / Edge extension for searching the web by image. It supports local image upload, clipboard images, and selecting an area from the current page.
+一款极简的 Chrome / Edge 以图搜索扩展，默认使用 Google。
 
-## Features
+## 功能
 
-- Search by uploading a local image.
-- Search from an image copied to the clipboard.
-- Drag to select a screenshot area on the current page.
-- Choose the default action for the main drop area.
-- Uses Google image search by default.
+- 上传本地图片搜索
+- 粘贴剪贴板图片搜索
+- 在当前页面拖拽选择截图区域搜索
+- 可设置主区域的默认操作
 
-## Install
+## 安装
 
-1. Download or clone this repository.
-2. Open the extensions page in Chrome or Edge.
-3. Enable developer mode.
-4. Choose **Load unpacked**.
-5. Select the project folder that contains `manifest.json`.
+1. 下载或克隆本仓库。
+2. 打开 Chrome / Edge 扩展管理页。
+3. 开启开发者模式。
+4. 点击“加载已解压的扩展”。
+5. 选择包含 `manifest.json` 的项目文件夹。
 
-## Use
+## 使用
 
-1. Click the extension icon in the browser toolbar.
-2. Choose an image source: upload, paste, or screenshot.
-3. For screenshots, drag on the current page to select an area.
-4. Click **Start search** when an image preview is ready.
+点击浏览器工具栏中的扩展图标，选择上传、粘贴或截图。图片准备好后，点击“开始搜索”。
 
-The main drop area can be configured from its top-right menu. The selected default action is saved locally in the browser.
+主区域右上角可选择默认操作；截图模式会在当前页面显示选区，拖拽后自动搜索。
 
-## Permissions
+## 权限说明
 
-- `activeTab`: access the current tab when selecting a screenshot area.
-- `clipboardRead`: read images from the clipboard after user action.
-- `scripting`: show the screenshot selection overlay on the current page.
-- `storage`: remember the main drop area's default action and pass image data between extension pages.
-- `tabs`: open the search result page.
-
-## Notes
-
-This extension currently uses Google as the default image search engine.
+- `activeTab`：在当前页面选择截图区域
+- `clipboardRead`：读取剪贴板图片
+- `scripting`：显示截图选区
+- `storage`：保存默认操作并传递图片数据
+- `tabs`：打开搜索结果页
