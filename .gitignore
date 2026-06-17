@@ -5,3 +5,4 @@ Thumbs.db
 *.pem
 .tools/
 LOCAL_NOTES.md
+LOCAL_*.png
