@@ -30,6 +30,11 @@ const SEARCH_ENGINES = {
     name: "Getty Images",
     mode: "clipboard",
     uploadUrl: "https://www.gettyimages.com/"
+  },
+  pinterest: {
+    name: "Pinterest",
+    mode: "clipboard",
+    uploadUrl: "https://www.pinterest.com/"
   }
 };
 

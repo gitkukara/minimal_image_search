@@ -8,7 +8,7 @@
 - 粘贴剪贴板图片搜索
 - 在当前页面拖拽选择截图区域搜索
 - 可设置主区域的默认操作
-- 支持 Google、百度、Yandex、TinEye、Getty Images
+- 支持 Google、百度、Yandex、TinEye、Getty Images、Pinterest
 
 ## 安装
 

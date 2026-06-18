@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3
+
+- Added Pinterest to the search engine selector.
+- Pinterest uses the same page automation flow as the other non-Google engines.
+
 ## 0.2.2
 
 - Added automatic upload attempts for Baidu, Yandex, TinEye, and Getty Images.
