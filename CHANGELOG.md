@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.3
+
+- Refined selected engine chips with a softer warm state and clearer selection marker.
+- Gave the all-select control a lighter pill-shaped hover target.
+
 ## 0.3.2
 
 - Changed the all-select control to toggle between selecting all and clearing back to one engine.

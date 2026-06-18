@@ -96,11 +96,19 @@ h2 {
 }
 
 .text-button {
-  border: 0;
+  min-height: 28px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0 8px;
   background: transparent;
-  color: #6d6257;
+  color: #7a6654;
   cursor: pointer;
   font-size: 13px;
+}
+
+.text-button:hover {
+  border-color: #e6dfd2;
+  background: #f6f1e8;
 }
 
 .engine-list {
@@ -111,16 +119,22 @@ h2 {
 
 .engine-chip {
   display: inline-flex;
+  position: relative;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   min-height: 34px;
   border: 1px solid #e4ded1;
   border-radius: 999px;
-  padding: 0 12px;
+  padding: 0 13px 0 11px;
   background: #ffffff;
   color: #272522;
   cursor: pointer;
   font-size: 13px;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .engine-chip input {
@@ -131,22 +145,26 @@ h2 {
 
 .engine-chip::before {
   content: "";
-  width: 8px;
-  height: 8px;
-  border: 1px solid #b9b4aa;
+  width: 9px;
+  height: 9px;
+  border: 1px solid #c3bcaf;
   border-radius: 50%;
   background: #ffffff;
 }
 
 .engine-chip.is-selected {
-  border-color: #d1c3ad;
-  background: #fffaf0;
-  color: #272522;
+  border-color: #c8b491;
+  background: #f7f1e7;
+  color: #60472f;
+  box-shadow: inset 0 0 0 1px rgba(140, 111, 83, 0.08);
+  font-weight: 650;
 }
 
 .engine-chip.is-selected::before {
-  border-color: #8c6f53;
-  background: #f8bf3c;
+  width: 11px;
+  height: 11px;
+  border-color: #8f6a37;
+  background: radial-gradient(circle at 50% 50%, #6f4d28 0 2px, #f8bf3c 2.5px 100%);
 }
 
 .action-panel {
