@@ -1,75 +1,105 @@
+const ENGINES = [
+  { id: "google", name: "Google" },
+  { id: "baidu", name: "百度" },
+  { id: "yandex", name: "Yandex" },
+  { id: "tineye", name: "TinEye" },
+  { id: "getty", name: "Getty" },
+  { id: "pinterest", name: "Pinterest" }
+];
+
 const elements = {
-  dropzone: document.querySelector("#dropzone"),
-  defaultActionSelect: document.querySelector("#defaultActionSelect"),
-  engineSelect: document.querySelector("#engineSelect"),
+  engineList: document.querySelector("#engineList"),
   fileInput: document.querySelector("#fileInput"),
   pasteButton: document.querySelector("#pasteButton"),
-  previewImage: document.querySelector("#previewImage"),
-  previewText: document.querySelector("#previewText"),
   screenshotButton: document.querySelector("#screenshotButton"),
-  searchButton: document.querySelector("#searchButton"),
+  selectAllButton: document.querySelector("#selectAllButton"),
+  settingsButton: document.querySelector("#settingsButton"),
   status: document.querySelector("#status"),
   uploadButton: document.querySelector("#uploadButton")
 };
 
-let selectedImage = null;
+let visibleEngineIds = ENGINES.map((engine) => engine.id);
+let selectedEngineIds = ["google"];
 
 elements.uploadButton.addEventListener("click", () => elements.fileInput.click());
-elements.dropzone.addEventListener("click", (event) => {
-  if (event.target === elements.defaultActionSelect) {
-    return;
-  }
-
-  runDefaultAction();
-});
-elements.dropzone.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    runDefaultAction();
-  }
-});
-elements.defaultActionSelect.addEventListener("click", (event) => event.stopPropagation());
-elements.defaultActionSelect.addEventListener("change", () => {
-  chrome.storage.local.set({ defaultDropzoneAction: elements.defaultActionSelect.value });
-  updateDefaultActionText();
-});
+elements.pasteButton.addEventListener("click", pasteFromClipboard);
+elements.screenshotButton.addEventListener("click", selectScreenshotArea);
+elements.selectAllButton.addEventListener("click", selectAllVisibleEngines);
+elements.settingsButton.addEventListener("click", () => chrome.runtime.openOptionsPage());
 
 elements.fileInput.addEventListener("change", async () => {
   const [file] = elements.fileInput.files;
+  elements.fileInput.value = "";
   if (file) {
     await useFile(file);
   }
 });
 
-elements.pasteButton.addEventListener("click", pasteFromClipboard);
-elements.screenshotButton.addEventListener("click", selectScreenshotArea);
-elements.searchButton.addEventListener("click", searchSelectedImage);
+restoreEngineState();
 
-restoreDefaultAction();
-
-for (const eventName of ["dragenter", "dragover"]) {
-  elements.dropzone.addEventListener(eventName, (event) => {
-    event.preventDefault();
-    elements.dropzone.classList.add("is-dragging");
-  });
+async function restoreEngineState() {
+  const stored = await chrome.storage.local.get(["visibleEngineIds", "selectedEngineIds"]);
+  visibleEngineIds = normalizeVisibleEngines(stored.visibleEngineIds);
+  selectedEngineIds = normalizeSelectedEngines(stored.selectedEngineIds, visibleEngineIds);
+  renderEngineList();
 }
 
-for (const eventName of ["dragleave", "drop"]) {
-  elements.dropzone.addEventListener(eventName, () => {
-    elements.dropzone.classList.remove("is-dragging");
-  });
+function normalizeVisibleEngines(value) {
+  const ids = Array.isArray(value) ? value.filter((id) => ENGINES.some((engine) => engine.id === id)) : [];
+  return ids.length > 0 ? ids : ENGINES.map((engine) => engine.id);
 }
 
-elements.dropzone.addEventListener("drop", async (event) => {
-  event.preventDefault();
-  const file = [...event.dataTransfer.files].find((item) => item.type.startsWith("image/"));
-  if (!file) {
-    setStatus("没有找到可用的图片。");
-    return;
+function normalizeSelectedEngines(value, visibleIds) {
+  const ids = Array.isArray(value) ? value.filter((id) => visibleIds.includes(id)) : [];
+  if (ids.length > 0) {
+    return ids;
   }
 
-  await useFile(file);
-});
+  return visibleIds.includes("google") ? ["google"] : [visibleIds[0]];
+}
+
+function renderEngineList() {
+  elements.engineList.textContent = "";
+
+  for (const engine of ENGINES.filter((item) => visibleEngineIds.includes(item.id))) {
+    const chip = document.createElement("label");
+    const checkbox = document.createElement("input");
+    const selected = selectedEngineIds.includes(engine.id);
+
+    chip.className = `engine-chip${selected ? " is-selected" : ""}`;
+    checkbox.type = "checkbox";
+    checkbox.checked = selected;
+    checkbox.value = engine.id;
+    chip.append(checkbox, engine.name);
+
+    checkbox.addEventListener("change", () => toggleEngine(engine.id, checkbox.checked));
+    elements.engineList.append(chip);
+  }
+
+  elements.selectAllButton.textContent =
+    selectedEngineIds.length === visibleEngineIds.length ? "已全选" : "全选";
+}
+
+async function toggleEngine(engineId, checked) {
+  if (checked) {
+    selectedEngineIds = [...new Set([...selectedEngineIds, engineId])];
+  } else if (selectedEngineIds.length > 1) {
+    selectedEngineIds = selectedEngineIds.filter((id) => id !== engineId);
+  }
+
+  await saveSelectedEngines();
+  renderEngineList();
+}
+
+async function selectAllVisibleEngines() {
+  selectedEngineIds = [...visibleEngineIds];
+  await saveSelectedEngines();
+  renderEngineList();
+}
+
+function saveSelectedEngines() {
+  return chrome.storage.local.set({ selectedEngineIds });
+}
 
 async function useFile(file) {
   if (!file.type.startsWith("image/")) {
@@ -78,15 +108,7 @@ async function useFile(file) {
   }
 
   const dataUrl = await readFileAsDataUrl(file);
-  useDataUrl(dataUrl, file.name || "image.png");
-}
-
-function useDataUrl(dataUrl, fileName) {
-  selectedImage = { dataUrl, fileName };
-  elements.previewImage.src = dataUrl;
-  elements.dropzone.classList.add("has-image");
-  elements.searchButton.disabled = false;
-  setStatus("图片已就绪。");
+  await searchWithSelectedEngines(dataUrl, file.name || "image.png");
 }
 
 async function pasteFromClipboard() {
@@ -115,38 +137,33 @@ async function selectScreenshotArea() {
 
   const response = await chrome.runtime.sendMessage({
     type: "SELECT_SCREENSHOT_AREA",
-    engineId: elements.engineSelect.value
+    engineIds: selectedEngineIds
   });
+
   if (!response?.ok) {
     setStatus(response?.error || "截图取消或失败。");
     return;
   }
 
-  setStatus("截图已提交搜索。");
+  setStatus(`已提交到 ${selectedEngineIds.length} 个搜索引擎。`);
 }
 
-async function searchSelectedImage() {
-  if (!selectedImage) {
-    return;
-  }
-
-  elements.searchButton.disabled = true;
-  setStatus("正在打开搜索结果...");
+async function searchWithSelectedEngines(dataUrl, fileName) {
+  setStatus(`正在打开 ${selectedEngineIds.length} 个搜索引擎...`);
 
   const response = await chrome.runtime.sendMessage({
-    type: "SEARCH_IMAGE",
-    engineId: elements.engineSelect.value,
-    ...selectedImage
+    type: "SEARCH_IMAGES",
+    engineIds: selectedEngineIds,
+    dataUrl,
+    fileName
   });
-
-  elements.searchButton.disabled = false;
 
   if (!response?.ok) {
     setStatus(response?.error || "搜索失败。");
     return;
   }
 
-  setStatus("搜索结果已打开。");
+  setStatus(`已提交到 ${selectedEngineIds.length} 个搜索引擎。`);
 }
 
 function readFileAsDataUrl(file) {
@@ -160,40 +177,4 @@ function readFileAsDataUrl(file) {
 
 function setStatus(message) {
   elements.status.textContent = message;
-}
-
-async function runDefaultAction() {
-  const action = elements.defaultActionSelect.value;
-  if (action === "paste") {
-    await pasteFromClipboard();
-    return;
-  }
-
-  if (action === "screenshot") {
-    await selectScreenshotArea();
-    return;
-  }
-
-  elements.fileInput.click();
-}
-
-async function restoreDefaultAction() {
-  const stored = await chrome.storage.local.get("defaultDropzoneAction");
-  if (stored.defaultDropzoneAction) {
-    elements.defaultActionSelect.value = stored.defaultDropzoneAction;
-  }
-
-  updateDefaultActionText();
-}
-
-function updateDefaultActionText() {
-  const labels = {
-    upload: "点击此处上传图片",
-    paste: "点击此处粘贴图片",
-    screenshot: "点击此处选择截图区域"
-  };
-
-  if (!elements.dropzone.classList.contains("has-image")) {
-    elements.previewText.textContent = labels[elements.defaultActionSelect.value] || labels.upload;
-  }
 }

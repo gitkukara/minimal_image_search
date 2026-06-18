@@ -13,26 +13,13 @@
           <p class="eyebrow">Image Search</p>
           <h1>以图搜索</h1>
         </div>
-        <select id="engineSelect" aria-label="选择搜索引擎">
-          <option value="google">Google</option>
-          <option value="baidu">Baidu</option>
-          <option value="yandex">Yandex</option>
-          <option value="tineye">TinEye</option>
-          <option value="getty">Getty</option>
-          <option value="pinterest">Pinterest</option>
-        </select>
+        <button id="settingsButton" class="icon-button" type="button" aria-label="打开设置">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"></path>
+            <path d="M19 13.4v-2.8l-2-.5a6 6 0 0 0-.7-1.6l1.1-1.8-2-2-1.8 1.1A6 6 0 0 0 12 5.1l-.6-2.1H8.6L8 5.1a6 6 0 0 0-1.6.7L4.6 4.7l-2 2 1.1 1.8A6 6 0 0 0 3 10.1l-2 .5v2.8l2 .5a6 6 0 0 0 .7 1.6l-1.1 1.8 2 2 1.8-1.1a6 6 0 0 0 1.6.7l.6 2.1h2.8l.6-2.1a6 6 0 0 0 1.6-.7l1.8 1.1 2-2-1.1-1.8a6 6 0 0 0 .7-1.6l2-.5Z"></path>
+          </svg>
+        </button>
       </header>
-
-      <section class="dropzone" id="dropzone" tabindex="0">
-        <select id="defaultActionSelect" class="default-action-select" aria-label="选择此处默认功能">
-          <option value="upload">上传图片</option>
-          <option value="paste">粘贴图片</option>
-          <option value="screenshot">页面截图</option>
-        </select>
-        <img class="brand-mark" src="icons/icon-128.png" alt="" aria-hidden="true">
-        <p id="previewText">上传、粘贴或截取当前页面</p>
-        <img id="previewImage" alt="">
-      </section>
 
       <section class="actions" aria-label="图片来源">
         <button id="uploadButton" type="button">
@@ -58,7 +45,7 @@
           </span>
           粘贴图片
         </button>
-        <button id="screenshotButton" type="button">
+        <button id="screenshotButton" type="button" class="primary-action">
           <span class="action-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M7 4H5a1 1 0 0 0-1 1v2"></path>
@@ -72,17 +59,15 @@
         </button>
       </section>
 
-      <footer class="footer">
-        <button id="searchButton" type="button" disabled>
-          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="11" cy="11" r="6"></circle>
-            <path d="m16 16 4 4"></path>
-          </svg>
-          开始搜索
-        </button>
-        <p id="status" role="status" aria-live="polite"></p>
-      </footer>
+      <section class="engine-panel" aria-labelledby="engineTitle">
+        <div class="section-head">
+          <h2 id="engineTitle">搜索引擎</h2>
+          <button id="selectAllButton" class="text-button" type="button">全选</button>
+        </div>
+        <div id="engineList" class="engine-list"></div>
+      </section>
 
+      <p id="status" role="status" aria-live="polite"></p>
       <input id="fileInput" type="file" accept="image/*" hidden>
     </main>
 

@@ -2,11 +2,12 @@
   "manifest_version": 3,
   "name": "Minimal Image Search",
   "description": "Search the web by image from upload, clipboard, or a screenshot.",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "action": {
     "default_title": "Image Search",
     "default_popup": "src/popup.html"
   },
+  "options_page": "src/options.html",
   "background": {
     "service_worker": "src/background.js",
     "type": "module"

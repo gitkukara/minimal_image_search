@@ -44,6 +44,18 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
+  if (message?.type === "SEARCH_IMAGES") {
+    searchImages(message)
+      .then(sendResponse)
+      .catch((error) => {
+        sendResponse({
+          ok: false,
+          error: error instanceof Error ? error.message : "Image search failed."
+        });
+      });
+    return true;
+  }
+
   if (message?.type === "CAPTURE_VISIBLE_TAB") {
     captureVisibleTab()
       .then(sendResponse)
@@ -91,6 +103,36 @@ async function searchImage(message) {
   return { ok: true, message: `${engine.name} image search opened.` };
 }
 
+async function searchImages(message) {
+  const engineIds = normalizeEngineIds(message.engineIds);
+  const results = await Promise.allSettled(
+    engineIds.map((engineId) =>
+      searchImage({
+        engineId,
+        dataUrl: message.dataUrl,
+        fileName: message.fileName
+      })
+    )
+  );
+  const rejected = results.filter((result) => result.status === "rejected");
+
+  if (rejected.length === results.length) {
+    throw new Error("所有搜索引擎都启动失败。");
+  }
+
+  return {
+    ok: true,
+    launched: results.length - rejected.length,
+    failed: rejected.length
+  };
+}
+
+function normalizeEngineIds(engineIds) {
+  const ids = Array.isArray(engineIds) ? engineIds : ["google"];
+  const supported = ids.filter((engineId) => SEARCH_ENGINES[engineId]);
+  return supported.length > 0 ? [...new Set(supported)] : ["google"];
+}
+
 async function captureVisibleTab() {
   const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!activeTab?.windowId) {
@@ -125,8 +167,8 @@ async function selectScreenshotArea(message) {
   });
   const croppedDataUrl = await cropImageDataUrl(dataUrl, rect);
 
-  await searchImage({
-    engineId: message.engineId,
+  await searchImages({
+    engineIds: message.engineIds || [message.engineId || "google"],
     dataUrl: croppedDataUrl,
     fileName: "screenshot-selection.png"
   });

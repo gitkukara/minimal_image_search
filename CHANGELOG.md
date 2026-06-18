@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Redesigned the popup around direct action buttons.
+- Removed the main drop area and preview/search button flow.
+- Added multi-select search engines on the main popup.
+- Added an options page for choosing which engines appear in the popup.
+- Upload, paste, and screenshot actions now immediately search with all selected engines.
+
 ## 0.2.3
 
 - Added Pinterest to the search engine selector.
