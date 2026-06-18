@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+- Added automatic upload attempts for Baidu, Yandex, TinEye, and Getty Images.
+- Non-Google engines now open their search page and inject the selected image into the page upload control when possible.
+- Added a manual upload hint when an engine page cannot be automated.
+
 ## 0.2.1
 
 - Added Baidu, Yandex, TinEye, and Getty Images to the search engine selector.

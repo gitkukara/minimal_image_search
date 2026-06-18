@@ -1,23 +1,28 @@
 const SEARCH_ENGINES = {
   google: {
     name: "Google",
+    mode: "bridge",
     uploadPageUrl: "src/search.html"
   },
   baidu: {
     name: "Baidu",
-    uploadPageUrl: "src/search.html"
+    mode: "page",
+    uploadPageUrl: "https://graph.baidu.com/pcpage/index?tpl_from=pc"
   },
   yandex: {
     name: "Yandex",
-    uploadPageUrl: "src/search.html"
+    mode: "page",
+    uploadPageUrl: "https://yandex.com/images/"
   },
   tineye: {
     name: "TinEye",
-    uploadPageUrl: "src/search.html"
+    mode: "page",
+    uploadPageUrl: "https://tineye.com/"
   },
   getty: {
     name: "Getty Images",
-    uploadPageUrl: "src/search.html"
+    mode: "page",
+    uploadPageUrl: "https://www.gettyimages.com/"
   }
 };
 
@@ -67,12 +72,17 @@ async function searchImage(message) {
     throw new Error("Unsupported search engine.");
   }
 
-  await openUploadPageAndAttachImage(
-    engine.uploadPageUrl,
-    message.dataUrl,
-    message.fileName,
-    message.engineId || "google"
-  );
+  if (engine.mode === "page") {
+    await openEnginePageAndAttachImage(engine, message.dataUrl, message.fileName);
+  } else {
+    await openUploadPageAndAttachImage(
+      engine.uploadPageUrl,
+      message.dataUrl,
+      message.fileName,
+      message.engineId || "google"
+    );
+  }
+
   return { ok: true, message: `${engine.name} image search opened.` };
 }
 
@@ -133,6 +143,66 @@ async function openUploadPageAndAttachImage(url, dataUrl, fileName, engineId) {
   await chrome.tabs.create({
     url: chrome.runtime.getURL(`${url}?id=${encodeURIComponent(searchId)}`),
     active: true
+  });
+}
+
+async function openEnginePageAndAttachImage(engine, dataUrl, fileName) {
+  const tab = await chrome.tabs.create({
+    url: engine.uploadPageUrl,
+    active: true
+  });
+
+  if (!tab.id) {
+    throw new Error(`无法打开 ${engine.name}。`);
+  }
+
+  await waitForTabReady(tab.id);
+
+  let injections;
+  try {
+    injections = await chrome.scripting.executeScript({
+      target: { tabId: tab.id, allFrames: true },
+      func: attachImageToSearchPage,
+      args: [dataUrl, fileName || "image.png", engine.name]
+    });
+  } catch (error) {
+    injections = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: attachImageToSearchPage,
+      args: [dataUrl, fileName || "image.png", engine.name]
+    });
+  }
+
+  if (!injections?.some((item) => item.result?.ok)) {
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: showManualUploadHint,
+      args: [engine.name]
+    });
+  }
+}
+
+async function waitForTabReady(tabId) {
+  const tab = await chrome.tabs.get(tabId);
+  if (tab?.status === "complete") {
+    return;
+  }
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      chrome.tabs.onUpdated.removeListener(listener);
+      reject(new Error("搜索页面加载超时。"));
+    }, 15000);
+
+    function listener(updatedTabId, changeInfo) {
+      if (updatedTabId === tabId && changeInfo.status === "complete") {
+        clearTimeout(timeout);
+        chrome.tabs.onUpdated.removeListener(listener);
+        resolve();
+      }
+    }
+
+    chrome.tabs.onUpdated.addListener(listener);
   });
 }
 
@@ -314,4 +384,128 @@ function runScreenshotSelector() {
 
     window.addEventListener("keydown", onKeyDown, true);
   });
+}
+
+async function attachImageToSearchPage(dataUrl, fileName, engineName) {
+  const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+  const dataUrlToFile = (sourceDataUrl, sourceFileName) => {
+    const [metadata, base64Data] = sourceDataUrl.split(",");
+    const mimeMatch = metadata.match(/^data:(.*?);base64$/);
+    const mimeType = mimeMatch?.[1] || "image/png";
+    const bytes = atob(base64Data);
+    const buffer = new Uint8Array(bytes.length);
+
+    for (let index = 0; index < bytes.length; index += 1) {
+      buffer[index] = bytes.charCodeAt(index);
+    }
+
+    return new File([buffer], sourceFileName, { type: mimeType });
+  };
+  const findFileInput = () => {
+    const inputs = [...document.querySelectorAll("input[type='file']")];
+    return (
+      inputs.find((input) => {
+        const accept = input.getAttribute("accept") || "";
+        return accept.includes("image") || accept === "" || input.name?.toLowerCase().includes("image");
+      }) || inputs[0]
+    );
+  };
+  const file = dataUrlToFile(dataUrl, fileName);
+
+  const clickCandidate = () => {
+    const keywords = [
+      "search by image",
+      "image search",
+      "visual search",
+      "upload",
+      "camera",
+      "photo",
+      "以图",
+      "识图",
+      "图片",
+      "上传",
+      "поиск по картинке",
+      "картин"
+    ];
+    const selectors = [
+      "button",
+      "a",
+      "label",
+      "[role='button']",
+      "[aria-label]",
+      "[title]",
+      "[class*='camera' i]",
+      "[class*='upload' i]",
+      "[class*='image' i]",
+      "[class*='visual' i]",
+      "[class*='lens' i]"
+    ];
+    const candidates = [...document.querySelectorAll(selectors.join(","))];
+
+    const target = candidates.find((element) => {
+      const text = [
+        element.textContent,
+        element.getAttribute("aria-label"),
+        element.getAttribute("title"),
+        element.getAttribute("class")
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return keywords.some((keyword) => text.includes(keyword));
+    });
+
+    if (target) {
+      target.click();
+      return true;
+    }
+
+    return false;
+  };
+
+  for (let attempt = 0; attempt < 35; attempt += 1) {
+    const input = findFileInput();
+    if (input) {
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      input.files = transfer.files;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+      return { ok: true };
+    }
+
+    clickCandidate();
+    await sleep(300);
+  }
+
+  return { ok: false, engineName };
+}
+
+function showManualUploadHint(engineName) {
+  const existing = document.querySelector("[data-mis-upload-hint='true']");
+  if (existing) {
+    existing.remove();
+  }
+
+  const hint = document.createElement("div");
+  hint.dataset.misUploadHint = "true";
+  hint.textContent = `${engineName} 未找到可自动上传入口，请在本页手动上传图片。`;
+  hint.style.cssText = [
+    "position:fixed",
+    "top:16px",
+    "left:50%",
+    "transform:translateX(-50%)",
+    "z-index:2147483647",
+    "max-width:min(520px,calc(100vw - 32px))",
+    "padding:10px 14px",
+    "border-radius:8px",
+    "background:#171717",
+    "color:#fff",
+    "font:13px system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",
+    "box-shadow:0 10px 30px rgba(0,0,0,.22)"
+  ].join(";");
+
+  document.documentElement.append(hint);
+  setTimeout(() => hint.remove(), 7000);
 }
