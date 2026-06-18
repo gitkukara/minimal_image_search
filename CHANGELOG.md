@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.4
+
+- Unified `icon-16.png` with the transparent icon used by the other extension icon sizes.
+
 ## 0.3.3
 
 - Refined selected engine chips with a softer warm state and clearer selection marker.
