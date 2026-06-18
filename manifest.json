@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Minimal Image Search",
   "description": "Search the web by image from upload, clipboard, or a screenshot.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "action": {
     "default_title": "Image Search",
     "default_popup": "src/popup.html"
@@ -14,6 +14,7 @@
   "permissions": [
     "activeTab",
     "clipboardRead",
+    "clipboardWrite",
     "scripting",
     "storage",
     "tabs"
@@ -21,7 +22,11 @@
   "host_permissions": [
     "https://images.google.com/*",
     "https://www.google.com/*",
-    "https://lens.google.com/*"
+    "https://lens.google.com/*",
+    "https://graph.baidu.com/*",
+    "https://yandex.com/*",
+    "https://tineye.com/*",
+    "https://www.gettyimages.com/*"
   ],
   "icons": {
     "16": "src/icons/icon-16.png",

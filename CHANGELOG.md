@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- Added Baidu, Yandex, TinEye, and Getty Images to the search engine selector.
+- Google keeps the automatic upload flow.
+- Other engines open their image search page and try to copy the selected image to the clipboard for quick paste/upload.
+
 ## 0.2.0
 
 - Updated extension icons.

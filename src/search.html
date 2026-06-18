@@ -9,12 +9,13 @@
   <body>
     <main>
       <img class="mark" src="icons/icon-128.png" alt="" aria-hidden="true">
-      <h1>正在交给 Google</h1>
+      <h1 id="title">正在准备搜索</h1>
       <p id="status">准备图片...</p>
+      <button id="openEngineButton" type="button" hidden>打开搜索引擎</button>
 
       <form
         id="searchForm"
-        action="https://www.google.com/searchbyimage/upload?hl=zh-CN"
+        action=""
         method="post"
         enctype="multipart/form-data"
       >

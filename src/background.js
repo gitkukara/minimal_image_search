@@ -2,6 +2,22 @@ const SEARCH_ENGINES = {
   google: {
     name: "Google",
     uploadPageUrl: "src/search.html"
+  },
+  baidu: {
+    name: "Baidu",
+    uploadPageUrl: "src/search.html"
+  },
+  yandex: {
+    name: "Yandex",
+    uploadPageUrl: "src/search.html"
+  },
+  tineye: {
+    name: "TinEye",
+    uploadPageUrl: "src/search.html"
+  },
+  getty: {
+    name: "Getty Images",
+    uploadPageUrl: "src/search.html"
   }
 };
 
@@ -51,7 +67,12 @@ async function searchImage(message) {
     throw new Error("Unsupported search engine.");
   }
 
-  await openUploadPageAndAttachImage(engine.uploadPageUrl, message.dataUrl, message.fileName);
+  await openUploadPageAndAttachImage(
+    engine.uploadPageUrl,
+    message.dataUrl,
+    message.fileName,
+    message.engineId || "google"
+  );
   return { ok: true, message: `${engine.name} image search opened.` };
 }
 
@@ -98,11 +119,12 @@ async function selectScreenshotArea(message) {
   return { ok: true };
 }
 
-async function openUploadPageAndAttachImage(url, dataUrl, fileName) {
+async function openUploadPageAndAttachImage(url, dataUrl, fileName, engineId) {
   const searchId = crypto.randomUUID();
   await chrome.storage.session.set({
     [searchId]: {
       dataUrl,
+      engineId,
       fileName: fileName || "image.png",
       createdAt: Date.now()
     }
