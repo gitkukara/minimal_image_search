@@ -18,6 +18,8 @@ const elements = {
   uploadButton: document.querySelector("#uploadButton")
 };
 
+const extensionApi = getExtensionApi();
+
 let visibleEngineIds = ENGINES.map((engine) => engine.id);
 let selectedEngineIds = ["google"];
 
@@ -25,7 +27,7 @@ elements.uploadButton.addEventListener("click", () => elements.fileInput.click()
 elements.pasteButton.addEventListener("click", pasteFromClipboard);
 elements.screenshotButton.addEventListener("click", selectScreenshotArea);
 elements.selectAllButton.addEventListener("click", selectAllVisibleEngines);
-elements.settingsButton.addEventListener("click", () => chrome.runtime.openOptionsPage());
+elements.settingsButton.addEventListener("click", () => extensionApi.runtime.openOptionsPage());
 
 elements.fileInput.addEventListener("change", async () => {
   const [file] = elements.fileInput.files;
@@ -38,7 +40,7 @@ elements.fileInput.addEventListener("change", async () => {
 restoreEngineState();
 
 async function restoreEngineState() {
-  const stored = await chrome.storage.local.get(["visibleEngineIds", "selectedEngineIds"]);
+  const stored = await extensionApi.storage.local.get(["visibleEngineIds", "selectedEngineIds"]);
   visibleEngineIds = normalizeVisibleEngines(stored.visibleEngineIds);
   selectedEngineIds = normalizeSelectedEngines(stored.selectedEngineIds, visibleEngineIds);
   renderEngineList();
@@ -103,7 +105,7 @@ async function selectAllVisibleEngines() {
 }
 
 function saveSelectedEngines() {
-  return chrome.storage.local.set({ selectedEngineIds });
+  return extensionApi.storage.local.set({ selectedEngineIds });
 }
 
 async function useFile(file) {
@@ -140,7 +142,7 @@ async function pasteFromClipboard() {
 async function selectScreenshotArea() {
   setStatus("请在当前页面拖拽选择截图区域。");
 
-  const response = await chrome.runtime.sendMessage({
+  const response = await extensionApi.runtime.sendMessage({
     type: "SELECT_SCREENSHOT_AREA",
     engineIds: selectedEngineIds
   });
@@ -156,7 +158,7 @@ async function selectScreenshotArea() {
 async function searchWithSelectedEngines(dataUrl, fileName) {
   setStatus(`正在打开 ${selectedEngineIds.length} 个搜索引擎...`);
 
-  const response = await chrome.runtime.sendMessage({
+  const response = await extensionApi.runtime.sendMessage({
     type: "SEARCH_IMAGES",
     engineIds: selectedEngineIds,
     dataUrl,
@@ -182,4 +184,52 @@ function readFileAsDataUrl(file) {
 
 function setStatus(message) {
   elements.status.textContent = message;
+}
+
+function getExtensionApi() {
+  if (globalThis.chrome?.runtime?.id && globalThis.chrome?.storage?.local) {
+    return globalThis.chrome;
+  }
+
+  return createPreviewApi();
+}
+
+function createPreviewApi() {
+  const storageKey = "minimalImageSearchPreviewState";
+  document.documentElement.dataset.preview = "true";
+
+  return {
+    runtime: {
+      openOptionsPage() {
+        setStatus("预览模式：设置页只在扩展中打开。");
+      },
+      async sendMessage(message) {
+        console.info("Preview extension message", message);
+        return { ok: true, preview: true };
+      }
+    },
+    storage: {
+      local: {
+        async get(keys) {
+          const state = readPreviewState();
+          if (!Array.isArray(keys)) {
+            return state;
+          }
+
+          return Object.fromEntries(keys.map((key) => [key, state[key]]));
+        },
+        async set(values) {
+          localStorage.setItem(storageKey, JSON.stringify({ ...readPreviewState(), ...values }));
+        }
+      }
+    }
+  };
+
+  function readPreviewState() {
+    try {
+      return JSON.parse(localStorage.getItem(storageKey)) || {};
+    } catch {
+      return {};
+    }
+  }
 }

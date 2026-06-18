@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.5
+
+- Added local preview support for the popup page outside the extension runtime.
+
 ## 0.3.4
 
 - Unified `icon-16.png` with the transparent icon used by the other extension icon sizes.

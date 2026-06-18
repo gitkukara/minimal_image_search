@@ -16,12 +16,21 @@ body {
   background: #f7f7f4;
 }
 
+html[data-preview="true"] body {
+  display: grid;
+  width: auto;
+  min-height: 100vh;
+  place-items: start center;
+  padding-top: 32px;
+}
+
 button {
   font: inherit;
 }
 
 .shell {
   display: grid;
+  width: 360px;
   gap: 16px;
   padding: 18px;
 }
