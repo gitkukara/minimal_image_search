@@ -77,7 +77,7 @@ function renderEngineList() {
   }
 
   elements.selectAllButton.textContent =
-    selectedEngineIds.length === visibleEngineIds.length ? "已全选" : "全选";
+    selectedEngineIds.length === visibleEngineIds.length ? "取消全选" : "全选";
 }
 
 async function toggleEngine(engineId, checked) {
@@ -92,7 +92,12 @@ async function toggleEngine(engineId, checked) {
 }
 
 async function selectAllVisibleEngines() {
-  selectedEngineIds = [...visibleEngineIds];
+  selectedEngineIds =
+    selectedEngineIds.length === visibleEngineIds.length
+      ? visibleEngineIds.includes("google")
+        ? ["google"]
+        : [visibleEngineIds[0]]
+      : [...visibleEngineIds];
   await saveSelectedEngines();
   renderEngineList();
 }

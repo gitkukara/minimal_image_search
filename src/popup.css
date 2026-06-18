@@ -139,13 +139,13 @@ h2 {
 }
 
 .engine-chip.is-selected {
-  border-color: #171717;
-  background: #171717;
-  color: #ffffff;
+  border-color: #d1c3ad;
+  background: #fffaf0;
+  color: #272522;
 }
 
 .engine-chip.is-selected::before {
-  border-color: #f7f7f4;
+  border-color: #8c6f53;
   background: #f8bf3c;
 }
 
@@ -179,11 +179,6 @@ h2 {
 .icon-button:hover,
 .engine-chip:hover {
   border-color: #b9b4aa;
-}
-
-.actions button.primary-action {
-  border-color: #d1c3ad;
-  background: #fffaf0;
 }
 
 .action-icon {

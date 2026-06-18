@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2
+
+- Changed the all-select control to toggle between selecting all and clearing back to one engine.
+- Removed special emphasis from the screenshot action.
+- Changed selected engine chips from black to the warmer emphasized style.
+
 ## 0.3.1
 
 - Moved search engine selection above action buttons to match the usage flow.
