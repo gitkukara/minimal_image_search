@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+- Moved search engine selection above action buttons to match the usage flow.
+- Redesigned the settings button as a slider control icon.
+- Tightened popup spacing and hierarchy.
+
 ## 0.3.0
 
 - Redesigned the popup around direct action buttons.
