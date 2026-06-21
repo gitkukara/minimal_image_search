@@ -3,6 +3,7 @@
 ## 0.3.5
 
 - Added local preview support for the popup page outside the extension runtime.
+- Added a small local static server for side-by-side UI preview.
 
 ## 0.3.4
 
