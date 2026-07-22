@@ -4,5 +4,6 @@ Thumbs.db
 *.crx
 *.pem
 .tools/
+.agents/
 LOCAL_NOTES.md
 LOCAL_*.png

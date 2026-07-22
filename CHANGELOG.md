@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.8
+
+- Added challenge-aware TinEye upload retries so automatic search resumes after TinEye's browser verification page finishes.
+
+## 0.3.7
+
+- Restyled the popup and settings page with a warm coffee-inspired palette and subtle paper texture.
+- Switched interface copy to Noto Sans and headings to Noto Serif.
+- Aligned the search-engine and image-source section headings to the same horizontal position.
+
+## 0.3.6
+
+- Replaced Google's retired `/searchbyimage/upload` endpoint with the Google Images upload flow.
+- Restricted Google automation to the explicit "Search by image" control so it cannot attach the image to AI Mode.
+
 ## 0.3.5
 
 - Added local preview support for the popup page outside the extension runtime.
