@@ -8,8 +8,8 @@ const openEngineButton = document.querySelector("#openEngineButton");
 const SEARCH_ENGINES = {
   google: {
     name: "Google",
-    mode: "form",
-    uploadUrl: "https://www.google.com/searchbyimage/upload?hl=zh-CN"
+    mode: "clipboard",
+    uploadUrl: "https://images.google.com/imghp?hl=en"
   },
   baidu: {
     name: "Baidu",

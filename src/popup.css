@@ -1,8 +1,8 @@
 :root {
   color-scheme: light;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #f7f7f4;
-  color: #171717;
+  font-family: "Noto Sans SC", "Noto Sans", ui-sans-serif, system-ui, sans-serif;
+  background: #f2ebe1;
+  color: #34251d;
 }
 
 * {
@@ -11,9 +11,13 @@
 
 body {
   width: 360px;
-  min-height: 386px;
+  min-height: 402px;
   margin: 0;
-  background: #f7f7f4;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.38) 0 0.6px, transparent 0.95px),
+    radial-gradient(circle at 82% 42%, rgba(98, 63, 43, 0.045) 0 0.55px, transparent 0.9px),
+    linear-gradient(145deg, #f8f3eb 0%, #f1e8dc 55%, #eee3d5 100%);
+  background-size: 19px 19px, 23px 23px, auto;
 }
 
 html[data-preview="true"] body {
@@ -31,8 +35,8 @@ button {
 .shell {
   display: grid;
   width: 360px;
-  gap: 16px;
-  padding: 18px;
+  gap: 18px;
+  padding: 20px 18px 18px;
 }
 
 .topbar {
@@ -40,22 +44,30 @@ button {
   align-items: start;
   justify-content: space-between;
   gap: 14px;
+  padding-bottom: 2px;
 }
 
 .eyebrow {
-  margin: 0 0 4px;
-  color: #77736b;
-  font-size: 11px;
+  margin: 0 0 5px;
+  color: #92735f;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
+}
+
+h1,
+h2 {
+  font-family: "Noto Serif SC", "Noto Serif", ui-serif, Georgia, serif;
 }
 
 h1 {
   margin: 0;
-  font-size: 24px;
-  font-weight: 760;
-  letter-spacing: 0;
+  color: #4b2d1e;  /* #2e2019 */
+  font-size: 25px;
+  font-weight: 780;
+  letter-spacing: 0.01em;
+  line-height: 1.18;
 }
 
 .icon-button {
@@ -63,10 +75,11 @@ h1 {
   width: 38px;
   height: 38px;
   place-items: center;
-  border: 1px solid #e0dbd0;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #272522;
+  border: 1px solid #d8c7b8;
+  border-radius: 11px;
+  background: rgba(255, 252, 247, 0.82);
+  box-shadow: 0 5px 14px rgba(73, 45, 29, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: #5d4031;  /*#5d4031*/
   cursor: pointer;
 }
 
@@ -81,13 +94,10 @@ h1 {
   stroke-width: 1.8;
 }
 
-.engine-panel {
+.engine-panel,
+.action-panel {
   display: grid;
   gap: 10px;
-  border: 1px solid #ebe6da;
-  border-radius: 8px;
-  padding: 12px;
-  background: #ffffff;
 }
 
 .section-head {
@@ -98,32 +108,39 @@ h1 {
 
 h2 {
   margin: 0;
-  color: #4e4941;
-  font-size: 13px;
-  font-weight: 760;
-  letter-spacing: 0;
+  color: #4a3327;
+  font-size: 14px;
+  font-weight: 720;
+  letter-spacing: 0.02em;
+  line-height: 28px;
 }
 
 .text-button {
   min-height: 28px;
   border: 1px solid transparent;
   border-radius: 999px;
-  padding: 0 8px;
+  padding: 0 9px;
   background: transparent;
-  color: #7a6654;
+  color: #8a6249;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .text-button:hover {
-  border-color: #e6dfd2;
-  background: #f6f1e8;
+  border-color: #dac8b8;
+  background: rgba(255, 250, 243, 0.72);
 }
 
 .engine-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  min-height: 58px;
+  border: 1px solid #ddcec0;
+  border-radius: 13px;
+  padding: 12px;
+  background: rgba(255, 252, 247, 0.7);
+  box-shadow: 0 8px 22px rgba(77, 48, 31, 0.055), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .engine-chip {
@@ -132,18 +149,14 @@ h2 {
   align-items: center;
   gap: 8px;
   min-height: 34px;
-  border: 1px solid #e4ded1;
+  border: 1px solid #d9c9bb;
   border-radius: 999px;
   padding: 0 13px 0 11px;
-  background: #ffffff;
-  color: #272522;
+  background: #fffaf4;
+  color: #463127;
   cursor: pointer;
-  font-size: 13px;
-  transition:
-    background-color 120ms ease,
-    border-color 120ms ease,
-    color 120ms ease,
-    box-shadow 120ms ease;
+  font-size: 12px;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
 .engine-chip input {
@@ -156,29 +169,24 @@ h2 {
   content: "";
   width: 9px;
   height: 9px;
-  border: 1px solid #c3bcaf;
+  border: 1px solid #bda796;
   border-radius: 50%;
-  background: #ffffff;
+  background: #fffdf9;
 }
 
 .engine-chip.is-selected {
-  border-color: #c8b491;
-  background: #f7f1e7;
-  color: #60472f;
-  box-shadow: inset 0 0 0 1px rgba(140, 111, 83, 0.08);
+  border-color: #a56f45;
+  background: linear-gradient(180deg, #f3dcc2, #ead0b3);
+  box-shadow: 0 3px 8px rgba(104, 63, 37, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.52);
+  color: #4b2d1e;
   font-weight: 650;
 }
 
 .engine-chip.is-selected::before {
   width: 11px;
   height: 11px;
-  border-color: #8f6a37;
-  background: radial-gradient(circle at 50% 50%, #6f4d28 0 2px, #f8bf3c 2.5px 100%);
-}
-
-.action-panel {
-  display: grid;
-  gap: 10px;
+  border-color: #74472e;
+  background: radial-gradient(circle at 50% 50%, #fff3df 0 2px, #8a5535 2.5px 100%);
 }
 
 .actions {
@@ -190,39 +198,51 @@ h2 {
 .actions button {
   display: flex;
   min-width: 0;
-  min-height: 88px;
+  min-height: 92px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  border: 1px solid #e2dfd6;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #272522;
+  gap: 9px;
+  border: 1px solid #ddcec0;
+  border-radius: 13px;
+  background: linear-gradient(160deg, rgba(255, 253, 249, 0.94), rgba(248, 239, 229, 0.9));
+  box-shadow: 0 7px 17px rgba(77, 48, 31, 0.055), inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  color: #453027;
   cursor: pointer;
+  font-size: 12px;
+  transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
 .actions button:hover,
 .icon-button:hover,
 .engine-chip:hover {
-  border-color: #b9b4aa;
+  border-color: #a98268;
+  box-shadow: 0 8px 20px rgba(77, 48, 31, 0.11);
+  transform: translateY(-1px);
 }
 
 .action-icon {
   display: inline-grid;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   place-items: center;
-  border: 1px solid #ece8dd;
-  border-radius: 999px;
-  background: #f4f2ec;
-  color: #25231f;
+  border: 1px solid #decbbb;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f8ede0, #e7d3c1);
+  color: #684633;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
 #status {
-  min-height: 20px;
-  margin: 0;
-  color: #77736b;
-  font-size: 13px;
-  line-height: 1.45;
+  min-height: 18px;
+  margin: -2px 0 0;
+  color: #866d5c;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+button:focus-visible,
+.engine-chip:has(input:focus-visible) {
+  outline: 2px solid #9b6948;
+  outline-offset: 2px;
 }

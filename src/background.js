@@ -1,8 +1,8 @@
 const SEARCH_ENGINES = {
   google: {
     name: "Google",
-    mode: "bridge",
-    uploadPageUrl: "src/search.html"
+    mode: "page",
+    uploadPageUrl: "https://images.google.com/imghp?hl=en"
   },
   baidu: {
     name: "Baidu",
@@ -205,27 +205,55 @@ async function openEnginePageAndAttachImage(engine, dataUrl, fileName) {
 
   await waitForTabReady(tab.id);
 
-  let injections;
-  try {
-    injections = await chrome.scripting.executeScript({
-      target: { tabId: tab.id, allFrames: true },
-      func: attachImageToSearchPage,
-      args: [dataUrl, fileName || "image.png", engine.name]
-    });
-  } catch (error) {
-    injections = await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: attachImageToSearchPage,
-      args: [dataUrl, fileName || "image.png", engine.name]
-    });
+  const maximumAttempts = engine.name === "TinEye" ? 4 : 1;
+  let attached = false;
+
+  for (let attempt = 0; attempt < maximumAttempts; attempt += 1) {
+    const injections = await injectImageIntoTab(
+      tab.id,
+      dataUrl,
+      fileName || "image.png",
+      engine.name
+    );
+
+    if (injections.some((item) => item.result?.ok)) {
+      attached = true;
+      break;
+    }
+
+    if (attempt < maximumAttempts - 1) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
   }
 
-  if (!injections?.some((item) => item.result?.ok)) {
+  if (!attached) {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: showManualUploadHint,
       args: [engine.name]
     });
+  }
+}
+
+async function injectImageIntoTab(tabId, dataUrl, fileName, engineName) {
+  const args = [dataUrl, fileName, engineName];
+
+  try {
+    return await chrome.scripting.executeScript({
+      target: { tabId, allFrames: true },
+      func: attachImageToSearchPage,
+      args
+    });
+  } catch (error) {
+    try {
+      return await chrome.scripting.executeScript({
+        target: { tabId },
+        func: attachImageToSearchPage,
+        args
+      });
+    } catch (retryError) {
+      return [];
+    }
   }
 }
 
@@ -435,6 +463,8 @@ function runScreenshotSelector() {
 
 async function attachImageToSearchPage(dataUrl, fileName, engineName) {
   const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+  const isGoogle = engineName === "Google";
+  const initialFileInputs = new Set(document.querySelectorAll("input[type='file']"));
   const dataUrlToFile = (sourceDataUrl, sourceFileName) => {
     const [metadata, base64Data] = sourceDataUrl.split(",");
     const mimeMatch = metadata.match(/^data:(.*?);base64$/);
@@ -450,6 +480,13 @@ async function attachImageToSearchPage(dataUrl, fileName, engineName) {
   };
   const findFileInput = () => {
     const inputs = [...document.querySelectorAll("input[type='file']")];
+    if (isGoogle) {
+      const lensInputs = inputs.filter(
+        (input) => input.closest("[role='dialog']") || !initialFileInputs.has(input)
+      );
+      return lensInputs.find((input) => (input.getAttribute("accept") || "").includes("image")) || lensInputs[0];
+    }
+
     return (
       inputs.find((input) => {
         const accept = input.getAttribute("accept") || "";
@@ -460,6 +497,24 @@ async function attachImageToSearchPage(dataUrl, fileName, engineName) {
   const file = dataUrlToFile(dataUrl, fileName);
 
   const clickCandidate = () => {
+    if (isGoogle) {
+      const target = document.querySelector(
+        [
+          "[aria-label='Search by image']",
+          "[aria-label*='Search by image' i]",
+          "[title='Search by image']",
+          "[title*='Search by image' i]"
+        ].join(",")
+      );
+
+      if (target) {
+        target.click();
+        return true;
+      }
+
+      return false;
+    }
+
     const keywords = [
       "search by image",
       "image search",
